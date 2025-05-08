@@ -16,7 +16,7 @@ type RegisterRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-func BindAndValidate(c *gin.Context, obj interface{}) (bool, map[string]string) {
+func BindAndValidateRegistration(c *gin.Context, obj interface{}) (bool, map[string]string) {
 	if err := c.ShouldBindJSON(obj); err != nil {
 		// try to extract validator.ValidationErrors
 		var verrs validator.ValidationErrors

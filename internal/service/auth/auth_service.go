@@ -11,7 +11,7 @@ import (
 // AuthService defines the service for authentication.
 type AuthService interface {
 	Register(req validator.RegisterRequest) (*model.User, error)
-	// Login(req validator.LoginRequest)
+	Login(req validator.LoginRequest) (string, error)
 }
 
 // authService is the implementation of AuthService.
@@ -51,4 +51,25 @@ func (authS *authService) Register(req validator.RegisterRequest) (*model.User, 
 	}
 
 	return user, nil
+}
+
+func (authS *authService) Login(req validator.LoginRequest) (string, error) {
+	// Check if user exists
+	user, err := authS.userRepository.FindByEmail(req.Email)
+	if err != nil {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Check password
+	if !auth.CheckPassword(user.Password, req.Password) {
+		return "", errors.New("invalid email or password")
+	}
+
+	// Generate JWT token
+	token, err := auth.GenerateJWT(user.ID)
+	if err != nil {
+		return "", errors.New("failed to generate token")
+	}
+
+	return token, nil
 }

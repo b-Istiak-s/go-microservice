@@ -5,8 +5,13 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
+
+func init() {
+	godotenv.Load()
+}
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
@@ -47,6 +52,7 @@ func HashPassword(password string) (string, error) {
 }
 
 // CheckPassword compares hashed password and plain password.
-func CheckPassword(hashedPassword, password string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+func CheckPassword(hashedPassword, password string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+	return err == nil
 }

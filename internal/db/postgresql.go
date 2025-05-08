@@ -6,6 +6,7 @@ import (
 	"myapp/internal/model"
 	"os"
 
+	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -13,15 +14,19 @@ import (
 var DB *gorm.DB
 
 func InitDB() error {
+	dotEnvError := godotenv.Load()
+	if dotEnvError != nil {
+		log.Fatal("Error loading .env file")
+	}
 	var err error
 
 	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_SSLMODE"),
+		os.Getenv("POSTGRES_HOST"),
+		os.Getenv("POSTGRES_USER"),
+		os.Getenv("POSTGRES_PASSWORD"),
+		os.Getenv("POSTGRES_DB"),
+		os.Getenv("POSTGRES_PORT"),
+		os.Getenv("POSTGRES_SSL_MODE"),
 	)
 	// Connect to the database
 	// Use the DSN to connect to the PostgreSQL database

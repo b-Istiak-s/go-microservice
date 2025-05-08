@@ -26,3 +26,20 @@ func RegisterRoutes(router *gin.Engine) {
 		// authRoutes.POST("/login", authController.Login) // Enable when Login is ready
 	}
 }
+
+func LoginRoutes(router *gin.Engine) {
+	// Set up repository
+	userRepo := repository.NewUserRepository(db.DB)
+
+	// Set up service
+	authService := service.NewAuthService(userRepo)
+
+	// Set up controller
+	authController := controller.NewAuthController(authService)
+
+	// Group your routes under /api/auth
+	authRoutes := router.Group("/api/auth")
+	{
+		authRoutes.POST("/login", authController.Login)
+	}
+}
