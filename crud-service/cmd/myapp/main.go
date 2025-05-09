@@ -24,7 +24,7 @@ func main() {
 	route.LoginRoutes(router)
 
 	// Start the Gin server on port 8080
-	if err := router.Run(":8080"); err != nil {
+	if err := router.Run(":8081"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }
