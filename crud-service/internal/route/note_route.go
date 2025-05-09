@@ -22,5 +22,6 @@ func NoteRoutes(router *gin.Engine) {
 		noteRoutes.POST("/", noteController.CreateNote)
 		noteRoutes.GET("/", noteController.GetAllNotes)
 		noteRoutes.PUT("/:id", noteController.UpdateNote)
+		noteRoutes.DELETE("/:id", noteController.DeleteNote)
 	}
 }

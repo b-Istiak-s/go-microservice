@@ -117,7 +117,33 @@ func (nc *NoteController) UpdateNote(c *gin.Context) {
 }
 
 func (nc *NoteController) DeleteNote(c *gin.Context) {
-	// Implementation for deleting a note
+	userID, errBool := GetUserID(c)
+	if !errBool {
+		return // Error response already sent in GetUserID
+	}
+
+	// Fetch note ID from URL parameters
+	noteIDParam := c.Param("id")
+	noteID, err := strconv.ParseUint(noteIDParam, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid note ID")
+		return
+	}
+
+	note, err := nc.noteRepository.GetByID(uint(noteID))
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "Note not found", err.Error())
+		return
+	}
+	if note.UserID != userID {
+		response.Error(c, http.StatusForbidden, "You do not have permission to delete this note", nil)
+		return
+	}
+	if err := nc.noteRepository.Delete(note); err != nil {
+		response.Error(c, http.StatusInternalServerError, "Error deleting note")
+		return
+	}
+	response.Success(c, http.StatusOK, "Note deleted successfully", nil)
 }
 
 func GetUserID(c *gin.Context) (uint, bool) {
