@@ -4,10 +4,16 @@ import (
 	"crud-service/internal/auth"
 	"crud-service/internal/util/response"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
+
+func init() {
+	godotenv.Load()
+}
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -38,6 +44,30 @@ func AuthMiddleware() gin.HandlerFunc {
 
 		// Store user info in context for handlers to use
 		c.Set("userID", claims.UserID)
+
+		// Call the auth-service /verify endpoint
+		req, err := http.NewRequest("POST", os.Getenv("LOADBALANCER_URL")+"/api/auth/verify", nil)
+		if err != nil {
+			response.Error(c, http.StatusInternalServerError, "Internal server error")
+			c.Abort()
+			return
+		}
+		req.Header.Set("Authorization", authHeader)
+
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			response.Error(c, http.StatusInternalServerError, "Auth service unreachable")
+			c.Abort()
+			return
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode != http.StatusOK {
+			response.Error(c, http.StatusUnauthorized, "User verification failed")
+			c.Abort()
+			return
+		}
 
 		c.Next()
 	}
