@@ -19,6 +19,7 @@ func NewNoteController(noteRepository repository.NoteRepository) *NoteController
 		noteRepository: noteRepository,
 	}
 }
+
 func (noteController *NoteController) CreateNote(c *gin.Context) {
 	var req validator.CreateNoteRequest
 
@@ -29,18 +30,9 @@ func (noteController *NoteController) CreateNote(c *gin.Context) {
 		return
 	}
 
-	// Get userID from context
-	userIDInterface, exists := c.Get("userID")
-	if !exists {
-		response.Error(c, http.StatusUnauthorized, "User ID not found in context")
-		return
-	}
-
-	// Gin context stores values as interface{}, so you need to cast it
-	userID, ok := userIDInterface.(uint)
-	if !ok {
-		response.Error(c, http.StatusInternalServerError, "Invalid user ID type")
-		return
+	userID, err := GetUserID(c)
+	if !err {
+		return // Error response already sent in GetUserID
 	}
 
 	note := model.Note{
@@ -56,15 +48,46 @@ func (noteController *NoteController) CreateNote(c *gin.Context) {
 
 	response.Success(c, http.StatusCreated, "Note created successfully", note)
 }
+
 func (nc *NoteController) GetAllNotes(c *gin.Context) {
-	// Implementation for getting all notes
+	userId, errBool := GetUserID(c)
+	if !errBool {
+		return // Error response already sent in GetUserID
+	}
+	notes, err := nc.noteRepository.GetAll(userId)
+
+	if err != nil {
+		response.Error(c, http.StatusInternalServerError, "Error fetching notes", err.Error())
+		return
+	}
+
+	if len(notes) == 0 {
+		response.Success(c, http.StatusOK, "No notes found", nil)
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Notes fetched successfully", notes)
 }
-func (nc *NoteController) GetNoteByID(c *gin.Context) {
-	// Implementation for getting a note by ID
-}
+
 func (nc *NoteController) UpdateNote(c *gin.Context) {
 	// Implementation for updating a note
 }
 func (nc *NoteController) DeleteNote(c *gin.Context) {
 	// Implementation for deleting a note
+}
+
+func GetUserID(c *gin.Context) (uint, bool) {
+	userIDInterface, exists := c.Get("userID")
+	if !exists {
+		response.Error(c, http.StatusUnauthorized, "User ID not found in context")
+		return 0, false
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		response.Error(c, http.StatusInternalServerError, "Invalid user ID type")
+		return 0, false
+	}
+
+	return userID, true
 }
