@@ -33,18 +33,6 @@ func GenerateJWT(userID uint) (string, error) {
 	return token.SignedString(jwtSecret)
 }
 
-// ParseJWT verifies the token and returns the claims.
-func ParseJWT(tokenString string) (*Claims, error) {
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtSecret, nil
-	})
-	if claims, ok := token.Claims.(*Claims); ok && token.Valid {
-		return claims, nil
-	} else {
-		return nil, err
-	}
-}
-
 // HashPassword hashes the given password.
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)

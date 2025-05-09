@@ -9,13 +9,7 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-// LoginRequest represents the expected request body for user login.
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-}
-
-func BindAndValidateLogin(c *gin.Context, obj interface{}) (bool, map[string]string) {
+func BindAndValidateNote(c *gin.Context, obj interface{}) (bool, map[string]string) {
 	if err := c.ShouldBindJSON(obj); err != nil {
 		// try to extract validator.ValidationErrors
 		var verrs validator.ValidationErrors
@@ -30,8 +24,10 @@ func BindAndValidateLogin(c *gin.Context, obj interface{}) (bool, map[string]str
 				switch fe.Tag() {
 				case "required":
 					msg = fmt.Sprintf("%s is required", fe.Field())
-				case "email":
-					msg = fmt.Sprintf("%s must be a valid email", fe.Field())
+				case "min":
+					msg = fmt.Sprintf("%s must be at least %s characters", fe.Field(), fe.Param())
+				case "max":
+					msg = fmt.Sprintf("%s must be at most %s characters", fe.Field(), fe.Param())
 				default:
 					msg = fmt.Sprintf("%s is invalid", fe.Field())
 				}
