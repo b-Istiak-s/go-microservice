@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crud-service-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  # - host: crud-service.local  # Replace with your domain or IP
+   - http:
+      paths:
+      - path: /api/notes
+        pathType: Prefix
+        backend:
+          service:
+            name: crud-service
+            port:
+              number: 8080
+  # - host: auth-service.local  # Replace with your domain or IP
+   - http:
+      paths:
+      - path: /api/auth
+        pathType: Prefix
+        backend:
+          service:
+            name: auth-service
+            port:
+              number: 8080

@@ -17,7 +17,8 @@ func NoteRoutes(router *gin.Engine) {
 	noteController := controller.NewNoteController(noteRepo)
 
 	// Group your routes under /api/notes
-	noteRoutes := router.Group("/api/notes", middleware.AuthMiddleware())
+	// noteRoutes := router.Group("/api/notes", middleware.AuthMiddleware()) //for development
+	noteRoutes := router.Group("/", middleware.AuthMiddleware()) //for k8s
 	{
 		noteRoutes.POST("/", noteController.CreateNote)
 		noteRoutes.GET("/", noteController.GetAllNotes)

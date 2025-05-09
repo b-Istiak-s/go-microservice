@@ -21,7 +21,8 @@ func AuthRoutes(router *gin.Engine) {
 	authController := controller.NewAuthController(authService)
 
 	// Group your routes under /api/auth
-	authRoutes := router.Group("/api/auth")
+	// authRoutes := router.Group("/api/auth") // for development
+	authRoutes := router.Group("/") // for k8s
 	{
 		authRoutes.POST("/register", authController.Register)
 		authRoutes.POST("/login", authController.Login)
