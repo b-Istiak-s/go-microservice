@@ -8,7 +8,7 @@ import (
 
 type NoteRepository interface {
 	Create(note *model.Note) error
-	GetAll() ([]model.Note, error)
+	GetAll(userId uint) ([]model.Note, error)
 	GetByID(id uint) (*model.Note, error)
 	Update(note *model.Note) error
 	Delete(id uint) error
@@ -26,9 +26,9 @@ func NewNoteRepository(db *gorm.DB) NoteRepository {
 func (r *noteRepository) Create(note *model.Note) error {
 	return r.db.Create(note).Error
 }
-func (r *noteRepository) GetAll() ([]model.Note, error) {
+func (r *noteRepository) GetAll(userId uint) ([]model.Note, error) {
 	var notes []model.Note
-	err := r.db.Find(&notes).Error
+	err := r.db.Where(&model.Note{UserID: userId}).Find(&notes).Error
 	if err != nil {
 		return nil, err
 	}

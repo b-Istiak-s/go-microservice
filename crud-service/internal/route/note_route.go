@@ -20,5 +20,6 @@ func NoteRoutes(router *gin.Engine) {
 	noteRoutes := router.Group("/api/notes", middleware.AuthMiddleware())
 	{
 		noteRoutes.POST("/", noteController.CreateNote)
+		noteRoutes.GET("/", noteController.GetAllNotes)
 	}
 }
