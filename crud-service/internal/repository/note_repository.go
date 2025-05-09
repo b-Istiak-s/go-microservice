@@ -11,7 +11,7 @@ type NoteRepository interface {
 	GetAll(userId uint) ([]model.Note, error)
 	GetByID(id uint) (*model.Note, error)
 	Update(note *model.Note) error
-	Delete(id uint) error
+	Delete(note *model.Note) error
 }
 type noteRepository struct {
 	db *gorm.DB
@@ -45,6 +45,6 @@ func (r *noteRepository) GetByID(id uint) (*model.Note, error) {
 func (r *noteRepository) Update(note *model.Note) error {
 	return r.db.Save(note).Error
 }
-func (r *noteRepository) Delete(id uint) error {
-	return r.db.Delete(&model.Note{}, id).Error
+func (r *noteRepository) Delete(note *model.Note) error {
+	return r.db.Delete(note).Error
 }
