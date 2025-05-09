@@ -19,7 +19,7 @@ WORKDIR /app/auth-service/cmd/myapp
 RUN go build -o /auth-service/myapp .
 
 # Stage 2: Create the final lightweight image
-FROM alpine:latest
+FROM alpine:3.17
 
 WORKDIR /root/
 
