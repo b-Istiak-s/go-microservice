@@ -15,11 +15,11 @@ COPY . ./auth-service/
 # Set the working directory to where the main.go is located
 WORKDIR /app/auth-service/cmd/myapp
 
-# Build the Go app
-RUN go build -o /auth-service/myapp .
+# Build the Go app with CGO disabled for a fully static binary
+RUN CGO_ENABLED=0 go build -o /auth-service/myapp .
 
 # Stage 2: Create the final lightweight image
-FROM alpine:latest
+FROM alpine:3.17
 
 WORKDIR /root/
 
