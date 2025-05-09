@@ -21,7 +21,6 @@ func BindAndValidateLogin(c *gin.Context, obj interface{}) (bool, map[string]str
 		var verrs validator.ValidationErrors
 		errs := make(map[string]string)
 
-		fmt.Println("Error:", err, "Type:", fmt.Sprintf("%T", err), errors.As(err, &verrs))
 		if errors.As(err, &verrs) {
 			// validation‐error path
 			for _, fe := range verrs {
