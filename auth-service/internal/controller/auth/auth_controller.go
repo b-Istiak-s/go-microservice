@@ -67,6 +67,7 @@ func (authController *AuthController) UserExists(context *gin.Context) {
 	userIDInterface, exists := context.Get("userID")
 	if !exists {
 		response.Error(context, http.StatusUnauthorized, "User ID not found in context")
+		return
 	}
 
 	userID, ok := userIDInterface.(uint)
