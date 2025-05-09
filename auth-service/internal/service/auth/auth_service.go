@@ -12,6 +12,7 @@ import (
 type AuthService interface {
 	Register(req validator.RegisterRequest) (*model.User, error)
 	Login(req validator.LoginRequest) (string, error)
+	UserExists(userID uint) (bool, error)
 }
 
 // authService is the implementation of AuthService.
@@ -72,4 +73,14 @@ func (authS *authService) Login(req validator.LoginRequest) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (authS *authService) UserExists(userID uint) (bool, error) {
+	// Check if user exists
+	user, err := authS.userRepository.FindByID(userID)
+	if err != nil {
+		return false, err
+	}
+
+	return user != nil, nil
 }

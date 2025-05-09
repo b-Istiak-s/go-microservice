@@ -5,7 +5,7 @@ import (
 )
 
 // Success sends a standard success JSON response.
-func Success(c *gin.Context, status int, message string, data interface{}) {
+func Success(c *gin.Context, status int, message string, data ...interface{}) {
 	c.JSON(status, gin.H{
 		"success": true,
 		"message": message,
