@@ -2,7 +2,6 @@ package main
 
 import (
 	"crud-service/internal/db"
-	"crud-service/internal/route"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,8 +19,6 @@ func main() {
 	router := gin.Default()
 
 	// Register routes
-	route.RegisterRoutes(router)
-	route.LoginRoutes(router)
 
 	// Start the Gin server on port 8080
 	if err := router.Run(":8081"); err != nil {
