@@ -72,6 +72,7 @@ func (authController *AuthController) UserExists(context *gin.Context) {
 	userID, ok := userIDInterface.(uint)
 	if !ok {
 		response.Error(context, http.StatusInternalServerError, "Invalid user ID type")
+		return
 	}
 
 	_, err := authController.authService.UserExists(userID)
