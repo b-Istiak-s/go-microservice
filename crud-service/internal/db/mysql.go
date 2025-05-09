@@ -28,7 +28,7 @@ func InitDB() error {
 		os.Getenv("MYSQL_DB"),
 	)
 	// Connect to the database
-	// Use the DSN to connect to the PostgreSQL database
+	// Use the DSN to connect to the MySQL database
 	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("Error connecting to the database: %v", err)
