@@ -1,0 +1,50 @@
+package repository
+
+import (
+	"crud-service/internal/model"
+
+	"gorm.io/gorm"
+)
+
+type NoteRepository interface {
+	Create(note *model.Note) error
+	GetAll() ([]model.Note, error)
+	GetByID(id uint) (*model.Note, error)
+	Update(note *model.Note) error
+	Delete(id uint) error
+}
+type noteRepository struct {
+	db *gorm.DB
+}
+
+func NewNoteRepository(db *gorm.DB) NoteRepository {
+	return &noteRepository{
+		db: db,
+	}
+}
+
+func (r *noteRepository) Create(note *model.Note) error {
+	return r.db.Create(note).Error
+}
+func (r *noteRepository) GetAll() ([]model.Note, error) {
+	var notes []model.Note
+	err := r.db.Find(&notes).Error
+	if err != nil {
+		return nil, err
+	}
+	return notes, nil
+}
+func (r *noteRepository) GetByID(id uint) (*model.Note, error) {
+	var note model.Note
+	err := r.db.First(&note, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &note, nil
+}
+func (r *noteRepository) Update(note *model.Note) error {
+	return r.db.Save(note).Error
+}
+func (r *noteRepository) Delete(id uint) error {
+	return r.db.Delete(&model.Note{}, id).Error
+}
