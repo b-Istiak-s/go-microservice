@@ -6,6 +6,7 @@ import (
 	"crud-service/internal/util/response"
 	validator "crud-service/internal/validator/note"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,14 +51,14 @@ func (noteController *NoteController) CreateNote(c *gin.Context) {
 }
 
 func (nc *NoteController) GetAllNotes(c *gin.Context) {
-	userId, errBool := GetUserID(c)
+	userID, errBool := GetUserID(c)
 	if !errBool {
 		return // Error response already sent in GetUserID
 	}
-	notes, err := nc.noteRepository.GetAll(userId)
+	notes, err := nc.noteRepository.GetAll(userID)
 
 	if err != nil {
-		response.Error(c, http.StatusInternalServerError, "Error fetching notes", err.Error())
+		response.Error(c, http.StatusInternalServerError, "Error fetching notes")
 		return
 	}
 
@@ -68,10 +69,53 @@ func (nc *NoteController) GetAllNotes(c *gin.Context) {
 
 	response.Success(c, http.StatusOK, "Notes fetched successfully", notes)
 }
-
 func (nc *NoteController) UpdateNote(c *gin.Context) {
-	// Implementation for updating a note
+	var req validator.UpdateNoteRequest
+	// Bind and validate request
+	ok, errs := validator.BindAndValidateNote(c, &req)
+	if !ok {
+		response.Success(c, http.StatusUnprocessableEntity, "Validation Error", errs)
+		return
+	}
+
+	userID, errBool := GetUserID(c)
+	if !errBool {
+		return // Error response already sent in GetUserID
+	}
+
+	// Fetch note ID from URL parameters
+	noteIDParam := c.Param("id")
+	noteID, err := strconv.ParseUint(noteIDParam, 10, 32)
+	if err != nil {
+		response.Error(c, http.StatusBadRequest, "Invalid note ID")
+		return
+	}
+
+	note, err := nc.noteRepository.GetByID(uint(noteID))
+	if err != nil {
+		response.Error(c, http.StatusNotFound, "Note not found", err.Error())
+		return
+	}
+	if note.UserID != userID {
+		response.Error(c, http.StatusForbidden, "You do not have permission to update this note", nil)
+		return
+	}
+
+	if req.Title != "" {
+		note.Title = req.Title
+	}
+	if req.Content != "" {
+		note.Content = req.Content
+	}
+
+	if err := nc.noteRepository.Update(note); err != nil {
+		response.Error(c, http.StatusInternalServerError, "Error updating note")
+		return
+	}
+
+	response.Success(c, http.StatusOK, "Note updated successfully", note)
 }
+
 func (nc *NoteController) DeleteNote(c *gin.Context) {
 	// Implementation for deleting a note
 }
