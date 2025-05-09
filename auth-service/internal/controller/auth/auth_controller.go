@@ -60,3 +60,25 @@ func (authController *AuthController) Login(context *gin.Context) {
 
 	response.LoginSuccess(context, http.StatusOK, "Login Successful", token)
 }
+
+// Checks if the user exists
+func (authController *AuthController) UserExists(context *gin.Context) {
+
+	userIDInterface, exists := context.Get("userID")
+	if !exists {
+		response.Error(context, http.StatusUnauthorized, "User ID not found in context")
+	}
+
+	userID, ok := userIDInterface.(uint)
+	if !ok {
+		response.Error(context, http.StatusInternalServerError, "Invalid user ID type")
+	}
+
+	_, err := authController.authService.UserExists(userID)
+	if err != nil {
+		response.Error(context, http.StatusBadRequest, fmt.Sprintf("Error: %v", err.Error()))
+		return
+	}
+
+	response.Success(context, http.StatusOK, "User Exists Check")
+}

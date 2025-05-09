@@ -10,6 +10,7 @@ import (
 type UserRepository interface {
 	Create(user *model.User) error
 	FindByEmail(email string) (*model.User, error)
+	FindByID(id uint) (*model.User, error)
 }
 
 // userRepository is the implementation of UserRepository.
@@ -33,6 +34,15 @@ func (r *userRepository) Create(user *model.User) error {
 func (r *userRepository) FindByEmail(email string) (*model.User, error) {
 	var user model.User
 	result := r.db.Where("email = ?", email).First(&user)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return &user, nil
+}
+
+func (r *userRepository) FindByID(id uint) (*model.User, error) {
+	var user model.User
+	result := r.db.First(&user, id)
 	if result.Error != nil {
 		return nil, result.Error
 	}

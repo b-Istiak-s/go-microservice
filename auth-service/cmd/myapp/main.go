@@ -20,8 +20,7 @@ func main() {
 	router := gin.Default()
 
 	// Register routes
-	route.RegisterRoutes(router)
-	route.LoginRoutes(router)
+	route.AuthRoutes(router)
 
 	// Start the Gin server on port 8080
 	if err := router.Run(":8080"); err != nil {
