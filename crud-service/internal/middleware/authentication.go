@@ -8,11 +8,15 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func init() {
-	godotenv.Load()
+	// if os.Getenv("ENV") == "development" {
+	// 	err := godotenv.Load()
+	// 	if err != nil {
+	// 		log.Fatal("Error loading .env file")
+	// 	}
+	// }
 }
 
 func AuthMiddleware() gin.HandlerFunc {

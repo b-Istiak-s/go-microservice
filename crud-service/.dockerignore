@@ -1,0 +1,25 @@
+# Ignore the following:
+.git/
+*.gitignore
+*.md
+*.DS_Store
+*.log
+*.tmp
+.idea/
+.vscode/
+node_modules/
+*.swp
+*.swo
+
+# Ignore local development environments and build artifacts
+auth-service/bin/
+auth-service/pkg/
+auth-service/vendor/
+
+# Ignore Go build artifacts
+auth-service/*.out
+auth-service/*.exe
+auth-service/*.test
+
+# Ignore the .env file (consider keeping it outside of Docker for security reasons)
+# .env

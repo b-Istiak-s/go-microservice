@@ -5,12 +5,16 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func init() {
-	godotenv.Load()
+	// if os.Getenv("ENV") == "development" {
+	// 	err := godotenv.Load()
+	// 	if err != nil {
+	// 		log.Fatal("Error loading .env file")
+	// 	}
+	// }
 }
 
 var jwtSecret = []byte(os.Getenv("JWT_SECRET"))

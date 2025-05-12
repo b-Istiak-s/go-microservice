@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -14,10 +13,12 @@ import (
 var DB *gorm.DB
 
 func InitDB() error {
-	dotEnvError := godotenv.Load()
-	if dotEnvError != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// if os.Getenv("ENV") == "development" {
+	// 	err := godotenv.Load()
+	// 	if err != nil {
+	// 		log.Fatal("Error loading .env file")
+	// 	}
+	// }
 	var err error
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true",
