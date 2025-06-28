@@ -72,8 +72,6 @@ Both services are containerized with Docker and orchestrated using Kubernetes. E
 
 - `auth-service.yaml` – Deployment and service for Auth
 - `crud-service.yaml` – Deployment and service for CRUD
-- `postgres.yaml` – External PostgreSQL connection
-- `mysql.yaml` – External MySQL connection
 - `secret.yaml` – Secrets for DB credentials
 - `ingress.yaml` – Ingress configuration with path-based routing
 
@@ -81,22 +79,6 @@ Both services are containerized with Docker and orchestrated using Kubernetes. E
 
 - `/api/auth/...` → routes to `auth-service` (port 8080)
 - `/api/notes/...` → routes to `crud-service` (port 8081)
-
-### Environment Setup (Example)
-
-```yaml
-env:
-  - name: POSTGRES_HOST
-    value: 192.168.0.130
-  - name: POSTGRES_PORT
-    value: "5432"
-  - name: MYSQL_HOST
-    value: 192.168.0.130
-  - name: MYSQL_PORT
-    value: "3306"
-```
-
-Each service uses Kubernetes secrets to securely inject DB credentials and configuration.
 
 ---
 
@@ -177,9 +159,7 @@ Each service uses Kubernetes secrets to securely inject DB credentials and confi
 │   ├── auth-service.yaml
 │   ├── crud-service.yaml
 │   ├── ingress.yaml
-│   ├── mysql.yaml
-│   ├── postgres.yaml
-│   └── secret.yaml
+│   └── db-secret.example.yaml
 ├── LICENSE
 ├── README.md
 └── static
