@@ -15,15 +15,31 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: go-microservice:auth-service   # <- CHANGE THIS
+        image: go-microservice:auth-service
         ports:
         - containerPort: 8080
         env:
-        - name: DATABASE_URL
-          value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)?sslmode=disable
-        envFrom:
-        - secretRef:
-            name: db-secret
+        - name: POSTGRES_HOST
+          value: 192.168.0.130
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_PASSWORD
+        - name: POSTGRES_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: POSTGRES_DB
+        - name: POSTGRES_SSL_MODE
+          value: disable
 ---
 apiVersion: v1
 kind: Service

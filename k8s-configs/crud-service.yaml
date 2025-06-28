@@ -15,15 +15,31 @@ spec:
     spec:
       containers:
       - name: crud-service
-        image: go-microservice:crud-service   # <- CHANGE THIS
+        image: go-microservice:crud-service
         ports:
-        - containerPort: 8080
+        - containerPort: 8081
         env:
-        - name: DATABASE_URL
-          value: postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)?sslmode=disable
-        envFrom:
-        - secretRef:
-            name: db-secret
+        - name: MYSQL_HOST
+          value: 192.168.0.130
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_USER
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_PASSWORD
+        - name: MYSQL_DB
+          valueFrom:
+            secretKeyRef:
+              name: db-secret
+              key: MYSQL_DB
+        - name: LOADBALANCER_URL
+          value: http://192.168.49.2/
 ---
 apiVersion: v1
 kind: Service
@@ -34,5 +50,5 @@ spec:
   selector:
     app: crud-service
   ports:
-  - port: 8080
-    targetPort: 8080
+  - port: 8081
+    targetPort: 8081
