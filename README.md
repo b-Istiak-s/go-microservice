@@ -2,42 +2,44 @@
 
 ## Purpose Of The Repository
 
-This project demonstrates a **simple, modular microservices architecture** using Go (Golang), Docker, and Kubernetes, following clean architecture and applying **Domain-Driven Design (DDD) principles**.
+This repository demonstrates a **modular microservices architecture** using Go (Golang), Docker, and Kubernetes. It follows clean architecture principles and applies **DDD-inspired concepts** where relevant. 
+A video of API test is provided [here](static/go-microservice-insomnia-screenrecord.webm).
 
-It consists of two independent services:
+It contains two independent services:
 
 - **Auth Service (`auth-service`)**  
-  Responsible for user authentication and authorization. Uses **PostgreSQL** as its persistence layer.
+  Handles user registration, login, and authorization. Uses **PostgreSQL**.
 
 - **CRUD Service (`crud-service`)**  
-  Responsible for managing notes with basic Create, Read, Update, and Delete (CRUD) operations. Uses **MySQL** as its persistence layer.
+  Manages notes (Create, Read, Update, Delete). Uses **MySQL**.  
+  Also interacts with `auth-service` to verify users.
 
-Both services are containerized using Docker and orchestrated via Kubernetes configurations.
+Both services are containerized with Docker and orchestrated using Kubernetes. Each service runs two replicas and connects to its respective local database.
 
 ---
 
 ## Features
 
-- Clean microservice separation with dedicated databases.
-- Implementation of clean architecture and DDD principles.
-- HTTP API endpoints exposed via REST.
-- JWT-based authentication and authorization.
-- Validation layer for request/response.
-- Kubernetes-ready with YAML configurations.
-- Custom middlewares, error handling, and response formatting.
+- Clean separation of services with dedicated databases.
+- Follows clean architecture and DDD-inspired structuring.
+- REST-based HTTP APIs.
+- JWT authentication and route-level authorization.
+- Structured request validation and response formatting.
+- Kubernetes support with service and ingress routing.
+- Custom middleware and error handling.
 
 ---
 
 ## Tech Stack
 
 | Component         | Technology    |
-|--------------------|--------------|
-| Language            | Go (Golang)  |
-| API Protocol        | REST (HTTP)  |
-| Auth Service DB     | PostgreSQL   |
-| CRUD Service DB     | MySQL        |
-| Containers          | Docker       |
-| Orchestration       | Kubernetes   |
+|------------------|---------------|
+| Language         | Go (Golang)   |
+| API Protocol     | REST (HTTP)   |
+| Auth DB          | PostgreSQL    |
+| Notes DB         | MySQL         |
+| Containers       | Docker        |
+| Orchestration    | Kubernetes    |
 
 ---
 
@@ -45,138 +47,154 @@ Both services are containerized using Docker and orchestrated via Kubernetes con
 
 ### 1. Auth Service (`auth-service`)
 
-- **Purpose:** Handles user registration, login, and JWT issuance.
-- **Tech Stack:** Go, Gin, PostgreSQL
+- **Purpose:** User authentication and token handling.
+- **Stack:** Go, Gin, PostgreSQL
 - **Endpoints:**
-  - `POST /register`
-  - `POST /login`
-  - `POST /verify` (Protected) (crud-service calls the route to verify the logged in user exists)
+  - `POST /register` – Register new users
+  - `POST /login` – User login and JWT generation
+  - `POST /verify` – Internal verification (used by `crud-service`)
 
 ### 2. CRUD Service (`crud-service`)
 
-- **Purpose:** Manages user notes.
-- **Tech Stack:** Go, Gin, MySQL
+- **Purpose:** CRUD operations for user notes.
+- **Stack:** Go, Gin, MySQL
 - **Endpoints:**
-  - `POST /notes`
-  - `GET /notes`
-  - `PUT /notes/:id`
-  - `DELETE /notes/:id`
+  - `POST /notes` – Create a note
+  - `GET /notes` – List all notes
+  - `PUT /notes/:id` – Update a note
+  - `DELETE /notes/:id` – Delete a note
 
 ---
 
-## Kubernetes Configurations
+## Kubernetes Configuration
 
-- `auth-service.yaml`
-- `crud-service.yaml`
-- `mysql.yaml`
-- `postgres.yaml`
-- `ingress.yaml`
-- `secret.yaml`
+### Files
+
+- `auth-service.yaml` – Deployment and service for Auth
+- `crud-service.yaml` – Deployment and service for CRUD
+- `postgres.yaml` – External PostgreSQL connection
+- `mysql.yaml` – External MySQL connection
+- `secret.yaml` – Secrets for DB credentials
+- `ingress.yaml` – Ingress configuration with path-based routing
+
+### Ingress Routing
+
+- `/api/auth/...` → routes to `auth-service` (port 8080)
+- `/api/notes/...` → routes to `crud-service` (port 8081)
+
+### Environment Setup (Example)
+
+```yaml
+env:
+  - name: POSTGRES_HOST
+    value: 192.168.0.130
+  - name: POSTGRES_PORT
+    value: "5432"
+  - name: MYSQL_HOST
+    value: 192.168.0.130
+  - name: MYSQL_PORT
+    value: "3306"
+```
+
+Each service uses Kubernetes secrets to securely inject DB credentials and configuration.
 
 ---
 
 ## Repository Structure
 
 <details>
-<summary>Structure</summary>
+<summary>Click to expand</summary>
 
 ```plaintext
 .
 ├── auth-service
-│   ├── cmd
-│   │   └── myapp
-│   │       └── main.go
-│   ├── Dockerfile
-│   ├── go.mod
-│   ├── go.sum
-│   ├── internal
-│   │   ├── auth
-│   │   │   └── auth.go
-│   │   ├── controller
-│   │   │   └── auth
-│   │   │       └── auth_controller.go
-│   │   ├── db
-│   │   │   └── postgresql.go
-│   │   ├── middleware
-│   │   │   └── authentication.go
-│   │   ├── model
-│   │   │   └── user.go
-│   │   ├── repository
-│   │   │   └── auth
-│   │   │       └── user_repository.go
-│   │   ├── route
-│   │   │   └── auth_route.go
-│   │   ├── service
-│   │   │   └── auth
-│   │   │       └── auth_service.go
-│   │   ├── util
-│   │   │   └── response
-│   │   │       └── response.go
-│   │   └── validator
-│   │       └── auth
-│   │           ├── login_request.go
-│   │           └── register_request.go
-│   └── tmp
-│       └── build-errors.log
+│   ├── cmd
+│   │   └── myapp
+│   │       └── main.go
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   ├── internal
+│   │   ├── auth
+│   │   │   └── auth.go
+│   │   ├── controller
+│   │   │   └── auth
+│   │   │       └── auth_controller.go
+│   │   ├── db
+│   │   │   └── postgresql.go
+│   │   ├── middleware
+│   │   │   └── authentication.go
+│   │   ├── model
+│   │   │   └── user.go
+│   │   ├── repository
+│   │   │   └── auth
+│   │   │       └── user_repository.go
+│   │   ├── route
+│   │   │   └── auth_route.go
+│   │   ├── service
+│   │   │   └── auth
+│   │   │       └── auth_service.go
+│   │   ├── util
+│   │   │   └── response
+│   │   │       └── response.go
+│   │   └── validator
+│   │       └── auth
+│   │           ├── login_request.go
+│   │           └── register_request.go
+│   └── tmp
+│       └── build-errors.log
 ├── crud-service
-│   ├── cmd
-│   │   └── myapp
-│   │       └── main.go
-│   ├── Dockerfile
-│   ├── go.mod
-│   ├── go.sum
-│   └── internal
-│       ├── auth
-│       │   └── auth.go
-│       ├── controller
-│       │   └── note_controller.go
-│       ├── db
-│       │   └── mysql.go
-│       ├── middleware
-│       │   └── authentication.go
-│       ├── model
-│       │   └── note.go
-│       ├── repository
-│       │   └── note_repository.go
-│       ├── route
-│       │   └── note_route.go
-│       ├── util
-│       │   └── response
-│       │       └── response.go
-│       └── validator
-│           └── note
-│               ├── create_request.go
-│               ├── update_request.go
-│               └── validate_note.go
+│   ├── cmd
+│   │   └── myapp
+│   │       └── main.go
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   └── internal
+│       ├── auth
+│       │   └── auth.go
+│       ├── controller
+│       │   └── note_controller.go
+│       ├── db
+│       │   └── mysql.go
+│       ├── middleware
+│       │   └── authentication.go
+│       ├── model
+│       │   └── note.go
+│       ├── repository
+│       │   └── note_repository.go
+│       ├── route
+│       │   └── note_route.go
+│       ├── util
+│       │   └── response
+│       │       └── response.go
+│       └── validator
+│           └── note
+│               ├── create_request.go
+│               ├── update_request.go
+│               └── validate_note.go
 ├── k8s-configs
-│   ├── auth-service.yaml
-│   ├── crud-service.yaml
-│   ├── ingress.yaml
-│   ├── mysql.yaml
-│   ├── postgres.yaml
-│   └── secret.yaml
-└── README.md
-
-37 directories, 38 files
+│   ├── auth-service.yaml
+│   ├── crud-service.yaml
+│   ├── ingress.yaml
+│   ├── mysql.yaml
+│   ├── postgres.yaml
+│   └── secret.yaml
+├── LICENSE
+├── README.md
+└── static
+    ├── go-microservice-insomnia-screenrecord.webm
+    └── vs-code-go-profile.code-profile
 ```
+
 </details>
 
+---
 
-## Issues
+## Deployment Notes
 
-1. **Kubernetes Deployment Issues**
-   - Both services (`auth-service` and `crud-service`) run successfully in local Docker environments.
-   - However, when deployed in Kubernetes, both services face **database connection issues**.
-   - Possible reasons:
-     - Database services (`PostgreSQL` and `MySQL`) are not fully initialized when the microservices try to connect.
-     - Missing or incorrect Kubernetes `Service`, `Secret`, or `ConfigMap` configurations for DB connections.
-     - Network policies or incorrect `Service` discovery within the cluster.
-   - **Next Steps to fix:**
-     - Ensure proper `initContainers` or startup probes to verify DB readiness before service starts.
-     - Validate connection strings and ensure secrets are properly mounted.
-     - Check Kubernetes logs (`kubectl logs`) and events (`kubectl describe`) to pinpoint the issue.
-     - Use Kubernetes `liveness` and `readiness` probes effectively.
-
-2. **Secrets & Environment Configuration**
-   - Missing or incorrect environment variables (DB host, port, username, password) could cause connection failures.
-   - Ensure all sensitive data is securely configured using Kubernetes `Secrets` and not hardcoded.
+- Services use external databases accessible via `192.168.0.130`.
+- Each service has 2 replicas for availability.
+- All sensitive data is injected using Kubernetes secrets.
+- LoadBalancer or Ingress exposes services through a unified API endpoint.
+- `crud-service` internally calls `auth-service` to validate user identity.
